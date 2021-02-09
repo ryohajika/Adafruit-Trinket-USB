@@ -15,6 +15,7 @@ the file appropriate for the given clock rate.
 */
 
 #define __SFR_OFFSET 0      /* used by avr-libc's register definitions */
+
 #include "usbportability.h"
 #include "usbdrv.h"         /* for common defs */
 
@@ -387,6 +388,7 @@ usbMFTimeout:
 #   elif USB_CFG_CLOCK_KHZ == 20000
 #       include "usbdrvasm20.inc"
 #   else
-#       error "USB_CFG_CLOCK_KHZ is not one of the supported non-crc-rates!"
+#	warning "USB_CFG_CLOCK_KHZ is not one of the supported non-crc-rates! Defaulting to 16MHz."
+#	define USB_CFG_CLOCK_KHZ (F_CPU/1000)
 #   endif
 #endif /* USB_CFG_CHECK_CRC */

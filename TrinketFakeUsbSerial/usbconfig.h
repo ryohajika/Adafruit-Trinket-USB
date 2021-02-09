@@ -35,15 +35,29 @@ License along with TrinketFakeUsbSerial. If not, see
 
 /* ---------------------------- Hardware Config ---------------------------- */
 
+#if defined(__AVR_ATmega328P__)
+#define USB_CFG_IOPORTNAME	C
+#else
 #define USB_CFG_IOPORTNAME      B
+#endif
 /* This is the port where the USB bus is connected. When you configure it to
  * "B", the registers PORTB, PINB and DDRB will be used.
  */
+
+#if defined(__AVR_ATmega328P__)
+#define USB_CFG_DMINUS_BIT	1
+#else
 #define USB_CFG_DMINUS_BIT      3
+#endif
 /* This is the bit number in USB_CFG_IOPORT where the USB D- line is connected.
  * This may be any bit in the port.
  */
+
+#if defined(__AVR_ATmega328P__)
+#define USB_CFG_DPLUS_BIT	2
+#else
 #define USB_CFG_DPLUS_BIT       4
+#endif
 /* This is the bit number in USB_CFG_IOPORT where the USB D+ line is connected.
  * This may be any bit in the port. Please note that D+ must also be connected
  * to interrupt pin INT0! [You can also use other interrupts, see section
@@ -52,6 +66,7 @@ License along with TrinketFakeUsbSerial. If not, see
  * interrupt, the USB interrupt will also be triggered at Start-Of-Frame
  * markers every millisecond.]
  */
+
 #define USB_CFG_CLOCK_KHZ       (F_CPU/1000)
 /* Clock rate of the AVR in kHz. Legal values are 12000, 12800, 15000, 16000,
  * 16500, 18000 and 20000. The 12.8 MHz and 16.5 MHz versions of the code
@@ -61,6 +76,7 @@ License along with TrinketFakeUsbSerial. If not, see
  * Since F_CPU should be defined to your actual clock rate anyway, you should
  * not need to modify this setting.
  */
+
 #define USB_CFG_CHECK_CRC       0
 /* Define this to 1 if you want that the driver checks integrity of incoming
  * data packets (CRC checks). CRC checks cost quite a bit of code size and are
@@ -217,10 +233,11 @@ License along with TrinketFakeUsbSerial. If not, see
 /* define this macro to 1 if you want the function usbMeasureFrameLength()
  * compiled in. This function can be used to calibrate the AVR's RC oscillator.
  */
-#if defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny25__)
+
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny25__)
 #ifndef __ASSEMBLER__
 #include <avr/interrupt.h>  // for sei()
-extern void calibrateOscillator(void);
+extern void calibrateOscillator(void)
 #endif
 #define USB_RESET_HOOK(resetStarts)  if(!resetStarts){cli(); calibrateOscillator(); sei();}
 #endif
@@ -384,6 +401,16 @@ extern void calibrateOscillator(void);
  * which is not fully supported (such as IAR C) or if you use a differnt
  * interrupt than INT0, you may have to define some of these.
  */
+#if defined(__AVR_ATmega328P__)
+#define USB_INTR_CFG		PCMSK1
+#define USB_INTR_CFG_SET	(1 << USB_CFG_DPLUS_BIT)
+#define USB_INTR_CFG_CLR	0
+#define USB_INTR_ENABLE		PCICR
+#define USB_INTR_ENABLE_BIT	PCIE1
+#define USB_INTR_PENDING	PCIFR
+#define USB_INTR_PENDING_BIT	PCIF1
+#define USB_INTR_VECTOR		PCINT1_vect
+#else
 #define USB_INTR_CFG            PCMSK
 #define USB_INTR_CFG_SET        (1 << USB_CFG_DPLUS_BIT)
 #define USB_INTR_CFG_CLR        0
@@ -392,5 +419,6 @@ extern void calibrateOscillator(void);
 #define USB_INTR_PENDING        GIFR
 #define USB_INTR_PENDING_BIT    PCIF
 #define USB_INTR_VECTOR         PCINT0_vect
+#endif
 
 #endif /* __usbconfig_h_included__ */

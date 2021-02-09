@@ -110,7 +110,7 @@ void usbBegin()
 	sei();
 }
 
-#if defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny25__)
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATtiny85__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny25__)
 /* ------------------------------------------------------------------------- */
 /* ------------------------ Oscillator Calibration ------------------------- */
 /* ------------------------------------------------------------------------- */

@@ -1,6 +1,7 @@
-#!/usr/bin/env python
+# -*- coding: utf-8
 
 # TrinketFakeUsbSerialHostSW, Python edition, by Frank Zhao
+# Edited by Ryo Hajika for Python3.x
 # see http://learn.adafruit.com/trinket-fake-usb-serial
 
 # Copyright (c) 2013 Adafruit Industries
@@ -24,8 +25,12 @@
 # PyUSB, http://sourceforge.net/apps/trac/pyusb/
 # pySerial, http://pyserial.sourceforge.net/
 
-import sys, time, getopt, select
-import usb.core, usb.util
+import sys
+import time
+import getopt
+import select
+import usb.core
+import usb.util
 import serial
 
 def main(argv):
@@ -35,7 +40,7 @@ def main(argv):
     try:
        opts, args = getopt.getopt(argv,"hvsp:",["port="])
     except getopt.GetoptError:
-        print 'Error: GetoptError'
+        print('Error: GetoptError')
         printHelp()
         sys.exit(2)
     for opt, arg in opts:
@@ -49,12 +54,12 @@ def main(argv):
         elif opt in ("-s", "--silent"):
             silent = True
     if verbose:
-        print 'TrinketFakeUsbSerialHostSW Python Edition'
-        print 'port is ', port
+        print('TrinketFakeUsbSerialHostSW Python Edition')
+        print('port is ', port)
 
     ser = serial.Serial(port)
     if verbose and port != ser.portstr:
-        print 'port actually is ', ser.portstr
+        print('port actually is ', ser.portstr)
 
     trinketHandle = False
 
@@ -69,7 +74,7 @@ def main(argv):
 
         thisMsg = 'Trinket Connected'
         if verbose and wasDisconnected and trinketHandle and thisMsg != lastMsg:
-            print thisMsg
+            print(thisMsg)
             lastMsg = thisMsg
 
         endpoint = 0x81
@@ -86,11 +91,11 @@ def main(argv):
                     ret = trinketHandle.ctrl_transfer(0x43, 0x01, 0x00, 0x00, map(ord, data))
                     thisMsg = 'Sent to Trinket'
                     if verbose and thisMsg != lastMsg:
-                        print thisMsg
+                        print(thisMsg)
                         lastMsg = thisMsg
                 except Exception as ex:
                     if silent == False:
-                        print 'USB send error: ', ex
+                        print('USB send error: ', ex)
                     trinketHandle = False # pretend it's disconnected to retry later
                     time.sleep(0.1) # don't hog all CPU
                     break
@@ -103,20 +108,20 @@ def main(argv):
                 if readCnt > 0:
                     thisMsg = 'Read from Trinket'
                     if verbose and thisMsg != lastMsg:
-                        print thisMsg
+                        print(thisMsg)
                         lastMsg = thisMsg
                     try:
                         ser.write(bytearray(data))
                     except Exception as serEx:
                         if silent == False:
-                            print 'Serial Write Error: ', serEx
+                            print('Serial Write Error: ', serEx)
                         sys.exit() # this is an unrecoverable error
 
             except Exception as ex:
                 exStr = str(ex).lower()
                 if 'timeout' not in exStr: # ignore timeout errors, but all other errors signifies that the device disconnected
                     if silent == False:
-                        print 'USB read error: ', ex
+                        print('USB read error: ', ex)
                     time.sleep(0.1) # don't hog all CPU
                     trinketHandle = False # disconnect to reacquire
                     break
@@ -125,7 +130,7 @@ def main(argv):
         # end of while
         thisMsg = 'Trinket Disconnected'
         if verbose and thisMsg != lastMsg:
-            print thisMsg
+            print(thisMsg)
             lastMsg = thisMsg
 
 def findTrinket():
@@ -138,23 +143,23 @@ def findTrinket():
     return device
 
 def printHelp():
-    print 'http://learn.adafruit.com/trinket-fake-usb-serial'
-    print ''
-    print 'command line options:'
-    print '-h'
-    print '    will print the help'
-    print ''
-    print '-p <port name>'
-    print '    will set the serial port, this is required'
-    print ''
-    print '-v'
-    print '    will enable verbose output'
-    print ''
-    print '-s'
-    print '    will disable most error output (some errors I can\'t catch, sorry)'
-    print ''
-    print 'cause a keyboard interrupt to quit (press CTRL-C or CMD-C, or something like that)'
-    print 'or kill it in some other way'
+    print('http://learn.adafruit.com/trinket-fake-usb-serial')
+    print('')
+    print('command line options:')
+    print('-h')
+    print('    will print the help')
+    print('')
+    print('-p <port name>')
+    print('    will set the serial port, this is required')
+    print('')
+    print('-v')
+    print('    will enable verbose output')
+    print('')
+    print('-s')
+    print('    will disable most error output (some errors I can\'t catch, sorry)')
+    print('')
+    print('cause a keyboard interrupt to quit (press CTRL-C or CMD-C, or something like that)')
+    print('or kill it in some other way')
 
 if __name__ == "__main__":
     main(sys.argv[1:])
